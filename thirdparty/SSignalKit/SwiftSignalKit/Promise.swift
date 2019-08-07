@@ -6,8 +6,6 @@ public final class Promise<T> {
     private let disposable = MetaDisposable()
     private let subscribers = Bag<(T) -> Void>()
     
-    public var onDeinit: (() -> Void)?
-    
     public init(_ value: T) {
         self.value = value
         pthread_mutex_init(&self.lock, nil)
@@ -18,7 +16,6 @@ public final class Promise<T> {
     }
 
     deinit {
-        self.onDeinit?()
         pthread_mutex_destroy(&self.lock)
         self.disposable.dispose()
     }

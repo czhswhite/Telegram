@@ -24,11 +24,7 @@ public final class Subscriber<T, E> {
             self.disposable = nil
         }
         pthread_mutex_unlock(&self.lock)
-        if let freeDisposableValue = freeDisposable {
-            withExtendedLifetime(freeDisposableValue, {
-            })
-            freeDisposable = nil
-        }
+        freeDisposable = nil
         
         pthread_mutex_destroy(&self.lock)
     }
@@ -104,18 +100,11 @@ public final class Subscriber<T, E> {
         
         var disposeDisposable: Disposable? = nil
         
-        var next: ((T) -> Void)?
-        var error: ((E) -> Void)?
-        var completed: (() -> Void)?
-        
         pthread_mutex_lock(&self.lock)
         if !self.terminated {
             action = self.completed
-            next = self.next
             self.next = nil
-            error = self.error
             self.error = nil
-            completed = self.completed
             self.completed = nil
             self.terminated = true
             
@@ -123,16 +112,6 @@ public final class Subscriber<T, E> {
             self.disposable = nil
         }
         pthread_mutex_unlock(&self.lock)
-        
-        if let next = next {
-            withExtendedLifetime(next, {})
-        }
-        if let error = error {
-            withExtendedLifetime(error, {})
-        }
-        if let completed = completed {
-            withExtendedLifetime(completed, {})
-        }
         
         if action != nil {
             action()

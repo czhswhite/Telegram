@@ -2,14 +2,10 @@ import Foundation
 
 let doNothing: () -> Void = { }
 
-public enum NoValue {
-}
-
-public enum NoError {
-}
+public typealias NoError = Void
 
 public func identity<A>(a: A) -> A {
-    return a
+    return a;
 }
 
 precedencegroup PipeRight {
